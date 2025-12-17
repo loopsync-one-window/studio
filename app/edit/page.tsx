@@ -76,6 +76,14 @@ export default function Page() {
     const [colorSaturation, setColorSaturation] = useState(0)
     const [colorBrightness, setColorBrightness] = useState(100)
 
+    // Color Picker Refs
+    const satBoxRef = useRef<HTMLDivElement>(null)
+    const hueSliderRef = useRef<HTMLDivElement>(null)
+    const opacitySliderRef = useRef<HTMLDivElement>(null)
+    const [isDraggingSat, setIsDraggingSat] = useState(false)
+    const [isDraggingHue, setIsDraggingHue] = useState(false)
+    const [isDraggingOpacity, setIsDraggingOpacity] = useState(false)
+
     useEffect(() => {
         if (isEditing && inputRef.current) {
             inputRef.current.focus()
@@ -97,6 +105,112 @@ export default function Page() {
             document.removeEventListener("mousedown", handleClickOutside)
         }
     }, [])
+
+    // Color Picker Helper Functions
+    const hsbToHex = (h: number, s: number, b: number) => {
+        // Convert HSB to RGB
+        s = s / 100;
+        b = b / 100;
+
+        const c = b * s;
+        const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+        const m = b - c;
+
+        let r = 0, g = 0, bl = 0;
+
+        if (h >= 0 && h < 60) {
+            r = c; g = x; bl = 0;
+        } else if (h >= 60 && h < 120) {
+            r = x; g = c; bl = 0;
+        } else if (h >= 120 && h < 180) {
+            r = 0; g = c; bl = x;
+        } else if (h >= 180 && h < 240) {
+            r = 0; g = x; bl = c;
+        } else if (h >= 240 && h < 300) {
+            r = x; g = 0; bl = c;
+        } else {
+            r = c; g = 0; bl = x;
+        }
+
+        const red = Math.round((r + m) * 255);
+        const green = Math.round((g + m) * 255);
+        const blue = Math.round((bl + m) * 255);
+
+        return `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
+    };
+
+    const updateColorFromHSB = (h: number, s: number, b: number) => {
+        const newHex = hsbToHex(h, s, b);
+        setColorHex(newHex);
+    }
+
+    const handleSatMouseDown = (e: React.MouseEvent) => {
+        setIsDraggingSat(true)
+        updateSaturation(e.clientX, e.clientY)
+    }
+
+    const updateSaturation = (clientX: number, clientY: number) => {
+        if (satBoxRef.current) {
+            const rect = satBoxRef.current.getBoundingClientRect();
+            const x = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+            const y = Math.min(Math.max(clientY - rect.top, 0), rect.height);
+            const newSat = (x / rect.width) * 100;
+            const newBright = 100 - ((y / rect.height) * 100);
+            setColorSaturation(newSat);
+            setColorBrightness(newBright);
+            updateColorFromHSB(colorHue, newSat, newBright);
+        }
+    }
+
+    const handleHueMouseDown = (e: React.MouseEvent) => {
+        setIsDraggingHue(true)
+        updateHue(e.clientX)
+    }
+
+    const updateHue = (clientX: number) => {
+        if (hueSliderRef.current) {
+            const rect = hueSliderRef.current.getBoundingClientRect();
+            const x = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+            const newHue = (x / rect.width) * 360;
+            setColorHue(newHue);
+            updateColorFromHSB(newHue, colorSaturation, colorBrightness);
+        }
+    }
+
+    const handleOpacityMouseDown = (e: React.MouseEvent) => {
+        setIsDraggingOpacity(true)
+        updateOpacity(e.clientX)
+    }
+
+    const updateOpacity = (clientX: number) => {
+        if (opacitySliderRef.current) {
+            const rect = opacitySliderRef.current.getBoundingClientRect();
+            const x = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+            const newOpacity = Math.round((x / rect.width) * 100);
+            setColorOpacity(newOpacity);
+        }
+    }
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (isDraggingSat) updateSaturation(e.clientX, e.clientY);
+            if (isDraggingHue) updateHue(e.clientX);
+            if (isDraggingOpacity) updateOpacity(e.clientX);
+        }
+        const handleMouseUp = () => {
+            setIsDraggingSat(false)
+            setIsDraggingHue(false)
+            setIsDraggingOpacity(false)
+        }
+        if (isDraggingSat || isDraggingHue || isDraggingOpacity) {
+            window.addEventListener('mousemove', handleMouseMove)
+            window.addEventListener('mouseup', handleMouseUp)
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [isDraggingSat, isDraggingHue, isDraggingOpacity, colorHue, colorSaturation, colorBrightness])
 
     const finishEditing = () => {
         if (!title.trim()) {
@@ -472,14 +586,27 @@ export default function Page() {
                                                         <span>Solid</span>
                                                     </div>
 
-                                                    {/* Saturation/Brightness Square (Mock) */}
-                                                    <div className="h-32 w-full rounded-lg bg-gradient-to-b from-white to-black relative cursor-crosshair border border-white/10 overflow-hidden" style={{ background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, hsl(${colorHue}, 100%, 50%))` }}>
-                                                        <div className="absolute top-1/3 left-1/2 h-3 w-3 -ml-1.5 -mt-1.5 rounded-full border-2 border-white shadow-sm ring-1 ring-black/20"></div>
+                                                    {/* Saturation/Brightness Square */}
+                                                    <div
+                                                        ref={satBoxRef}
+                                                        onMouseDown={handleSatMouseDown}
+                                                        className="h-32 w-full rounded-lg bg-gradient-to-b from-white to-black relative cursor-crosshair border border-white/10 overflow-hidden touch-none"
+                                                        style={{ background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, hsl(${colorHue}, 100%, 50%))` }}
+                                                    >
+                                                        <div
+                                                            className="absolute h-3 w-3 -ml-1.5 -mt-1.5 rounded-full border-2 border-white shadow-sm ring-1 ring-black/20 pointer-events-none"
+                                                            style={{ left: `${colorSaturation}%`, top: `${100 - colorBrightness}%` }}
+                                                        ></div>
                                                     </div>
 
                                                     {/* Hue Slider */}
-                                                    <div className="h-3 w-full rounded-full relative cursor-pointer" style={{ background: 'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)' }}>
-                                                        <div className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white rounded-full border border-black/10 shadow-sm" style={{ left: `${(colorHue / 360) * 100}%` }}></div>
+                                                    <div
+                                                        ref={hueSliderRef}
+                                                        onMouseDown={handleHueMouseDown}
+                                                        className="h-3 w-full rounded-full relative cursor-pointer touch-none"
+                                                        style={{ background: 'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)' }}
+                                                    >
+                                                        <div className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white rounded-full border border-black/10 shadow-sm pointer-events-none" style={{ left: `${(colorHue / 360) * 100}%` }}></div>
                                                     </div>
 
                                                     {/* Opacity Slider */}
@@ -488,9 +615,13 @@ export default function Page() {
                                                             <span>Opacity</span>
                                                             <span>{colorOpacity}%</span>
                                                         </div>
-                                                        <div className="h-3 w-full rounded-full bg-[url('https:// Checkerboard_pattern_url_placeholder ')] bg-zinc-800 relative cursor-pointer overflow-hidden">
+                                                        <div
+                                                            ref={opacitySliderRef}
+                                                            onMouseDown={handleOpacityMouseDown}
+                                                            className="h-3 w-full rounded-full bg-zinc-800 relative cursor-pointer overflow-hidden touch-none"
+                                                        >
                                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white" style={{ opacity: colorOpacity / 100 }}></div>
-                                                            <div className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white rounded-full border border-black/10 shadow-sm" style={{ left: `${colorOpacity}%` }}></div>
+                                                            <div className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white rounded-full border border-black/10 shadow-sm pointer-events-none" style={{ left: `${colorOpacity}%` }}></div>
                                                         </div>
                                                     </div>
 
@@ -521,7 +652,7 @@ export default function Page() {
 
                                 <AdjustmentSection title="Spacing" icon={Baseline}>
                                     <SliderControl label="Line Height" value={1.2} min={0.5} max={3} />
-                                    <SliderControl label="Letter Spacing" value={0} min={-10} max={20} />
+                                    <SliderControl label="Letter Spacing" value={0} min={-10} max={25} />
                                 </AdjustmentSection>
 
                                 <AdjustmentSection title="Layout" icon={LayoutTemplate}>
