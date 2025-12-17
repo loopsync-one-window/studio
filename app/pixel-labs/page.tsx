@@ -68,6 +68,7 @@ export default function Page() {
     const [isFontOpen, setIsFontOpen] = useState(false)
     const [isWeightOpen, setIsWeightOpen] = useState(false)
 
+
     // Color Picker State
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false)
     const [colorHex, setColorHex] = useState("#FFFFFF")
@@ -83,6 +84,12 @@ export default function Page() {
     const [isDraggingSat, setIsDraggingSat] = useState(false)
     const [isDraggingHue, setIsDraggingHue] = useState(false)
     const [isDraggingOpacity, setIsDraggingOpacity] = useState(false)
+
+    // URL Import State
+    const [isUrlImportOpen, setIsUrlImportOpen] = useState(false)
+    const [importUrl, setImportUrl] = useState("")
+    const [urlError, setUrlError] = useState("")
+    const [isValidUrl, setIsValidUrl] = useState(false)
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -225,6 +232,59 @@ export default function Page() {
         }
     }
 
+    // URL Import Validation
+    const validateUrl = (url: string) => {
+        setImportUrl(url)
+
+        if (!url.trim()) {
+            setUrlError("")
+            setIsValidUrl(false)
+            return
+        }
+
+        // Check if it's a valid URL
+        try {
+            const urlObj = new URL(url)
+
+            // Check if it's http or https
+            if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                setUrlError("URL must start with http:// or https://")
+                setIsValidUrl(false)
+                return
+            }
+
+            // Check for common image extensions
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp']
+            const hasImageExtension = imageExtensions.some(ext =>
+                urlObj.pathname.toLowerCase().endsWith(ext)
+            )
+
+            if (!hasImageExtension) {
+                setUrlError("URL should point to an image file")
+                setIsValidUrl(false)
+                return
+            }
+
+            setUrlError("")
+            setIsValidUrl(true)
+        } catch (error) {
+            setUrlError("Please enter a valid URL")
+            setIsValidUrl(false)
+        }
+    }
+
+    const handleImportFromUrl = () => {
+        if (isValidUrl) {
+            // TODO: Implement actual image import logic
+            console.log("Importing from URL:", importUrl)
+            // Reset after import
+            setImportUrl("")
+            setIsUrlImportOpen(false)
+            setUrlError("")
+            setIsValidUrl(false)
+        }
+    }
+
     return (
         <div className="flex flex-col h-full w-full">
             {/* Fixed Header */}
@@ -287,7 +347,7 @@ export default function Page() {
                 </div>
 
                 {/* Sub-Sidebar / Properties Panel */}
-                <div className="w-[280px] flex-none border-r border-white/5 bg-[#0f0f0f] flex flex-col hidden lg:flex">
+                <div className="w-[280px] flex-none border-r border-white/5 bg-black/40 flex flex-col hidden lg:flex z-20">
                     {activeTool === "magic" ? (
                         <div className="flex flex-col h-full animate-in slide-in-from-left-5 duration-300 fade-in">
                             <div className="p-4 border-b border-white/5">
@@ -670,6 +730,124 @@ export default function Page() {
                                         <button className="h-12 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-center font-bold text-white uppercase tracking-widest flex items-center justify-center">Poster</button>
                                         <button className="h-12 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-center font-black text-white stroke-black flex items-center justify-center" style={{ textShadow: '2px 2px 0 #000' }}>MEME</button>
                                         <button className="h-12 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-center font-medium text-yellow-300 bg-black/50 flex items-center justify-center">Subtitle</button>
+                                    </div>
+                                </AdjustmentSection>
+
+                            </div>
+                        </div>
+                    ) : activeTool === "uploads" ? (
+                        <div className="flex flex-col h-full animate-in slide-in-from-left-5 duration-300 fade-in">
+                            <div className="p-4 border-b border-white/5">
+                                <h2 className="font-medium text-sm text-white">Uploads</h2>
+                            </div>
+                            <div className="p-4 space-y-6 overflow-y-auto">
+
+                                <AdjustmentSection title="Drag & Drop" icon={ImageIcon}>
+                                    <div className="p-8 rounded-xl border-2 border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-all cursor-pointer group">
+                                        <div className="flex flex-col items-center justify-center gap-3 text-center">
+                                            <div className="h-12 w-12 rounded-full bg-white/5 group-hover:bg-white/10 flex items-center justify-center transition-colors">
+                                                <ImageIcon className="h-6 w-6 text-zinc-400 group-hover:text-white transition-colors" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white mb-1">Drop files here</p>
+                                                <p className="text-xs text-zinc-500">or Browse Files</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </AdjustmentSection>
+
+                                <AdjustmentSection title="Paste / Import" icon={Spline}>
+                                    <div className="space-y-2">
+                                        <button className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all group">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors">
+                                                    <Ghost className="h-4 w-4 text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="text-xs font-medium text-white">Paste from Clipboard</div>
+                                                    <div className="text-[10px] text-zinc-500 group-hover:text-zinc-400">Ctrl + V</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={() => setIsUrlImportOpen(!isUrlImportOpen)}
+                                            className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all group"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors">
+                                                    <Spline className="h-4 w-4 text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="text-xs font-medium text-white">Import from URL</div>
+                                                    <div className="text-[10px] text-zinc-500 group-hover:text-zinc-400">Paste image link</div>
+                                                </div>
+                                                <ChevronDown className={`h-4 w-4 text-zinc-500 transition-transform ${isUrlImportOpen ? 'rotate-180' : ''}`} />
+                                            </div>
+                                        </button>
+
+                                        {isUrlImportOpen && (
+                                            <div className="p-4 rounded-xl bg-black/20 border border-white/10 space-y-3 animate-in slide-in-from-top-2 fade-in duration-200">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs text-zinc-400 font-medium">Image URL</label>
+                                                    <Input
+                                                        value={importUrl}
+                                                        onChange={(e) => validateUrl(e.target.value)}
+                                                        placeholder="https://example.com/image.jpg"
+                                                        className={`h-9 bg-black/20 border text-white text-xs ${urlError
+                                                            ? 'border-red-500/50 focus:border-red-500'
+                                                            : isValidUrl
+                                                                ? 'border-green-500/50 focus:border-green-500'
+                                                                : 'border-white/10 focus:border-white/20'
+                                                            }`}
+                                                    />
+                                                    {urlError && (
+                                                        <p className="text-[10px] text-red-400 flex items-center gap-1">
+                                                            <span className="inline-block w-1 h-1 rounded-full bg-red-400"></span>
+                                                            {urlError}
+                                                        </p>
+                                                    )}
+                                                    {isValidUrl && (
+                                                        <p className="text-[10px] text-green-400 flex items-center gap-1">
+                                                            <span className="inline-block w-1 h-1 rounded-full bg-green-400"></span>
+                                                            Valid image URL
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <Button
+                                                    onClick={handleImportFromUrl}
+                                                    disabled={!isValidUrl}
+                                                    className={`w-full h-9 rounded-lg font-medium text-xs transition-all ${isValidUrl
+                                                        ? 'bg-white text-black hover:bg-zinc-200'
+                                                        : 'bg-white/10 text-white/40 cursor-not-allowed'
+                                                        }`}
+                                                >
+                                                    Import Image
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </AdjustmentSection>
+
+                                <AdjustmentSection title="Your Uploads" icon={ImageIcon}>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {[...Array(8)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="aspect-square rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group relative overflow-hidden"
+                                            >
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <ImageIcon className="h-6 w-6 text-zinc-700 group-hover:text-zinc-500 transition-colors" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </AdjustmentSection>
+
+                                <AdjustmentSection title="Sort" icon={LayoutTemplate}>
+                                    <div className="flex p-1 bg-black/20 rounded-xl">
+                                        <button className="flex-1 py-2 text-xs font-medium text-black bg-white rounded-lg shadow-sm">Recent</button>
+                                        <button className="flex-1 py-2 text-xs font-medium text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Name</button>
+                                        <button className="flex-1 py-2 text-xs font-medium text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Size</button>
                                     </div>
                                 </AdjustmentSection>
 

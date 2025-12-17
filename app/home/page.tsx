@@ -1,47 +1,109 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus } from "lucide-react"
+import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus, Search, FileText, Layout, Instagram, Globe, MoreHorizontal, Play, Clock } from "lucide-react"
 
 export default function Page() {
     return (
         <>
-            {/* Fixed Header */}
-            <div className="flex-none p-6 lg:p-10 pb-0 z-20">
-                <div className="max-w-6xl w-full mx-auto pl-4">
-                    <header className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <SidebarTrigger className="-ml-1" />
-                            <h1 className="text-3xl font-light tracking-wide text-zinc-100">Home</h1>
-                        </div>
-                    </header>
-                </div>
-            </div>
-
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6 lg:p-10 pt-6">
-                <div className="relative z-10 max-w-6xl w-full mx-auto space-y-16 pl-4">
+                <div className="relative z-10 max-w-6xl w-full mx-auto space-y-12 pl-4">
 
-                    {/* Face Swap Hero Section */}
-                    <section className="space-y-6">
+                    {/* Hero Section (Canva-like) */}
+                    <section className="flex flex-col items-center text-center space-y-8 py-10">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-center gap-4 mb-4">
+                                <SidebarTrigger className="-ml-1 md:hidden" />
+                                <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">One Studio. Every Visual.</h1>
+                            </div>
+                            <p className="text-zinc-400 text-lg">Create stunning visuals, videos, and more with Studio 3.0</p>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="relative w-full max-w-2xl group">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-zinc-500 group-focus-within:text-white transition-colors" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search your content or try our templates"
+                                className="w-full h-14 pl-12 pr-4 bg-transparent border border-white/5 rounded-full text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all shadow-lg"
+                            />
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-4">
+                            <QuickAction icon={<FileText className="h-6 w-6 text-white" />} label="Doc" />
+                            <QuickAction icon={<Layout className="h-6 w-6 text-white" />} label="Whiteboard" />
+                            <QuickAction icon={<Video className="h-6 w-6 text-white" />} label="Video" />
+                            <QuickAction icon={<Instagram className="h-6 w-6 text-white" />} label="Social Info" />
+                            <QuickAction icon={<Globe className="h-6 w-6 text-white" />} label="Website" />
+                            <QuickAction icon={<MoreHorizontal className="h-6 w-6 text-white" />} label="More" />
+                        </div>
+                    </section>
+
+                    {/* My Creations (History) */}
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-white">My Creations</h2>
+                            <Button variant="link" className="text-zinc-400 hover:text-white">See all</Button>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <CreationCard title="Project Alpha" type="Video" date="Edited 2h ago" image="/api/placeholder/400/300" />
+                            <CreationCard title="Marketing Post" type="Social" date="Edited 5h ago" image="/api/placeholder/400/300" />
+                            <CreationCard title="Q4 Report" type="Doc" date="Edited 1d ago" image="/api/placeholder/400/300" />
+                            <CreationCard title="Untitled Design" type="Image" date="Edited 2d ago" image="/api/placeholder/400/300" />
+                        </div>
+                    </section>
+
+                    {/* Sponsors & Trending Music Split */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Sponsors */}
+                        <section className="space-y-4">
+                            <h2 className="text-xl font-semibold text-white">Trusted By</h2>
+                            <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
+                                <div className="grid grid-cols-3 gap-6 opacity-60">
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                    <div className="h-8 bg-white/20 rounded animate-pulse" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Music Albums */}
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-semibold text-white">Trending Music</h2>
+                                <Button variant="link" className="text-zinc-400 hover:text-white">Browse</Button>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <AlbumCard title="Midnight" artist="The Weeknd" color="bg-blue-500" />
+                                <AlbumCard title="Solar Power" artist="Lorde" color="bg-yellow-500" />
+                                <AlbumCard title="30" artist="Adele" color="bg-emerald-500" />
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Face Swap (Moved down) */}
+                    <section className="space-y-6 pt-8 border-t border-white/5">
                         <div className="flex items-center gap-2 mb-2">
                             <h2 className="text-2xl font-semibold text-white">Face Swap</h2>
-                            <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20">LS Vision-Pro Model</span>
+                            <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20">Popular Tool</span>
                         </div>
 
                         <div className="p-8 border border-white/5 mt-5 rounded-3xl bg-black/50 relative overflow-hidden group">
-                            {/* Subtle background glow */}
-
-                            <div className="relative z-10 flex flex-col items-center mt-10">
+                            <div className="relative z-10 flex flex-col items-center mt-6">
                                 <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl mx-auto">
-
                                     {/* Source Image */}
                                     <div className="flex-1 w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group/upload">
                                         <div className="h-16 w-16 rounded-full bg-zinc-800 flex items-center justify-center group-hover/upload:bg-zinc-700 transition-colors">
                                             <Upload className="h-6 w-6 text-zinc-400 group-hover/upload:text-zinc-200" />
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-zinc-300 font-medium">Upload Source Image</p>
-                                            <p className="text-zinc-500 text-sm">The face to swap</p>
+                                            <p className="text-zinc-300 font-medium">Upload Source</p>
                                         </div>
                                     </div>
 
@@ -58,13 +120,12 @@ export default function Page() {
                                             <ImagePlus className="h-6 w-6 text-zinc-400 group-hover/upload:text-zinc-200" />
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-zinc-300 font-medium">Upload Target Image</p>
-                                            <p className="text-zinc-500 text-sm">Image to receive face</p>
+                                            <p className="text-zinc-300 font-medium">Upload Target</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="mt-10">
+                                <div className="mt-8">
                                     <Button size="lg" className="h-12 px-8 rounded-full bg-white text-black hover:bg-zinc-200 font-medium text-base shadow-xl shadow-white/5 transition-all hover:scale-105 active:scale-95">
                                         <Sparkles className="mr-2 h-4 w-4 text-black" />
                                         Swap Faces Now
@@ -108,6 +169,55 @@ export default function Page() {
                 </div>
             </div>
         </>
+    )
+}
+
+function QuickAction({ icon, label }: { icon: React.ReactNode, label: string }) {
+    return (
+        <div className="flex flex-col items-center gap-2 group cursor-pointer">
+            <div className="h-14 w-14 rounded-full bg-[#1e1e1e] border border-white/5 flex items-center justify-center group-hover:bg-white/10 group-hover:scale-110 transition-all shadow-md">
+                {icon}
+            </div>
+            <span className="text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">{label}</span>
+        </div>
+    )
+}
+
+function CreationCard({ title, type, date, image }: { title: string, type: string, date: string, image: string }) {
+    return (
+        <div className="group cursor-pointer">
+            <div className="aspect-[4/3] bg-[#1e1e1e] rounded-xl border border-white/5 relative overflow-hidden mb-3 group-hover:border-white/20 transition-all">
+                {/* Using a simple div with background for placeholder image */}
+                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60" />
+                <div className="absolute bottom-3 left-3 right-3">
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-black/50 backdrop-blur-md border border-white/10 text-[10px] font-medium text-zinc-300 mb-1">
+                        {type}
+                    </div>
+                </div>
+                {/* Placeholder content pattern */}
+                <div className="absolute inset-0 opacity-10 flex items-center justify-center" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '16px 16px' }}>
+                    <div className="h-12 w-12 rounded-full border-2 border-white/20" />
+                </div>
+            </div>
+            <h3 className="text-sm font-medium text-zinc-200 group-hover:text-white truncate">{title}</h3>
+            <p className="text-xs text-zinc-500">{date}</p>
+        </div>
+    )
+}
+
+function AlbumCard({ title, artist, color }: { title: string, artist: string, color: string }) {
+    return (
+        <div className={`aspect-square rounded-xl ${color} bg-opacity-10 border border-white/5 p-4 flex flex-col justify-end relative group cursor-pointer overflow-hidden hover:bg-opacity-20 transition-all`}>
+            <div className={`absolute inset-0 ${color} opacity-10`} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
+                <Play className="h-5 w-5 text-black fill-current ml-0.5" />
+            </div>
+            <div className="relative z-10">
+                <h3 className="font-semibold text-white/90 truncate">{title}</h3>
+                <p className="text-xs text-white/60 truncate">{artist}</p>
+            </div>
+        </div>
     )
 }
 

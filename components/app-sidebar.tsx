@@ -9,9 +9,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
-    SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Home, Edit3, Search, Image as ImageIcon, Sparkles } from "lucide-react"
+import { Home, Search, Image as ImageIcon, Aperture, Clapperboard } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import Image from "next/image"
 import Link from "next/link"
@@ -52,18 +51,26 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/edit"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Edit">
-                            <Link href="/edit">
-                                <Edit3 className="h-5 w-5 shrink-0" />
-                                <span className="group-data-[collapsible=icon]:hidden">Edit</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
                         <SidebarMenuButton asChild size="lg" isActive={pathname === "/search"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Search">
                             <Link href="/search">
                                 <Search className="h-5 w-5 shrink-0" />
                                 <span className="group-data-[collapsible=icon]:hidden">Search</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/pixel-labs"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Pixel Labs">
+                            <Link href="/pixel-labs">
+                                <Aperture className="h-5 w-5 shrink-0" />
+                                <span className="group-data-[collapsible=icon]:hidden">Pixel Labs</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/motion-labs"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Motion Labs">
+                            <Link href="/motion-labs">
+                                <Clapperboard className="h-5 w-5 shrink-0" />
+                                <span className="group-data-[collapsible=icon]:hidden">Motion Labs</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
