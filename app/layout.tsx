@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Roboto, Merriweather, Courier_Prime } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -14,6 +14,29 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
+});
+
+const roboto = Roboto({
+    weight: ["400", "500", "700"],
+    subsets: ["latin"],
+    variable: "--font-roboto",
+});
+
+const merriweather = Merriweather({
+    weight: ["300", "400", "700", "900"],
+    subsets: ["latin"],
+    variable: "--font-merriweather",
+});
+
+const courierPrime = Courier_Prime({
+    weight: ["400", "700"],
+    subsets: ["latin"],
+    variable: "--font-courier-prime",
+});
+
 export const metadata: Metadata = {
     title: "LoopSync Studio",
     description: "AI Design Studio",
@@ -26,7 +49,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="dark">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <body className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${merriweather.variable} ${courierPrime.variable} antialiased`}>
                 <SidebarProvider>
                     <div className="flex h-screen w-full bg-[#0a0a0a] text-white font-sans selection:bg-red-900/60 overflow-hidden">
                         <AppSidebar />

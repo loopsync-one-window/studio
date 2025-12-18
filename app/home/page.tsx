@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus, Search, FileText, Layout, Instagram, Globe, MoreHorizontal, Play, Clock, Music } from "lucide-react"
@@ -9,7 +10,7 @@ export default function Page() {
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6 lg:p-10 pt-6 relative overflow-hidden">
                 {/* Background Dithering Effect */}
-                <div className="absolute right-0 top-0 w-1/1 h-[600px] z-0 pointer-events-none opacity-80 mix-blend-screen">
+                <div className="absolute right-0 top-0 w-[300px] h-[600px] z-0 pointer-events-none opacity-80 mix-blend-screen">
                     <Dithering
                         style={{ height: "100%", width: "100%" }}
                         colorBack="hsl(0, 0%, 0%)"
@@ -19,7 +20,7 @@ export default function Page() {
                         pxSize={3}
                         offsetX={0}
                         offsetY={0}
-                        scale={0.8}
+                        scale={0.5}
                         rotation={0}
                         speed={0.1}
                     />
@@ -60,7 +61,7 @@ export default function Page() {
 
                         {/* Quick Actions */}
                         <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-4">
-                            <QuickAction icon={<FileText className="h-6 w-6 text-white" />} label="Doc" />
+                            <QuickAction icon={<FileText className="h-6 w-6 text-white" />} label="Docs" href="/docs?module=studio-3.0&version=2.1&lang=en&type=edit&id=STUDIO-3.0-DOCS-uhb776874637345435" />
                             <QuickAction icon={<Layout className="h-6 w-6 text-white" />} label="Whiteboard" />
                             <QuickAction icon={<Video className="h-6 w-6 text-white" />} label="Video" />
                             <QuickAction icon={<Instagram className="h-6 w-6 text-white" />} label="Social Info" />
@@ -240,8 +241,8 @@ export default function Page() {
     )
 }
 
-function QuickAction({ icon, label }: { icon: React.ReactNode, label: string }) {
-    return (
+function QuickAction({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) {
+    const Content = (
         <div className="flex flex-col items-center gap-2 group cursor-pointer">
             <div className="h-14 w-14 rounded-full bg-transparent backdrop-blur-sm border border-white/5 flex items-center justify-center group-hover:bg-transparent group-hover:scale-110 transition-all shadow-md">
                 {icon}
@@ -249,6 +250,12 @@ function QuickAction({ icon, label }: { icon: React.ReactNode, label: string }) 
             <span className="text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">{label}</span>
         </div>
     )
+
+    if (href) {
+        return <Link href={href}>{Content}</Link>
+    }
+
+    return Content
 }
 
 function CreationCard({ title, type, date, image }: { title: string, type: string, date: string, image: string }) {

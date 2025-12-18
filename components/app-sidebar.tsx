@@ -26,6 +26,10 @@ export function AppSidebar() {
     const { state, toggleSidebar } = useSidebar()
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
+    if (pathname?.startsWith("/docs")) {
+        return null
+    }
+
     return (
         <Sidebar collapsible="icon" className="border-r-0 bg-sidebar text-sidebar-foreground group/sidebar z-[9999]">
             <div className="flex flex-col h-full w-full overflow-hidden relative">
