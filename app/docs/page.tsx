@@ -6,9 +6,17 @@ import { DocsHeader } from "@/components/docs/docs-header"
 import { DocsToolbar } from "@/components/docs/docs-toolbar"
 import { DocsRightSidebar } from "@/components/docs/docs-right-sidebar"
 import { DocsEditor } from "@/components/docs/docs-editor"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 
 export default function DocsPage() {
+    return (
+        <Suspense>
+            <DocsPageInner />
+        </Suspense>
+    )
+}
+
+function DocsPageInner() {
     const searchParams = useSearchParams()
 
     // Params matching the requested URL structure
