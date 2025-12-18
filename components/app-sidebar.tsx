@@ -84,8 +84,8 @@ export function AppSidebar() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/motionOS"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Motion OS">
-                                <Link href="/motionOS">
+                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/cinemaOS"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Motion OS">
+                                <Link href="/cinemaOS">
                                     <Clapperboard className="h-5 w-5 shrink-0" />
                                     <span className="group-data-[collapsible=icon]:hidden font-semibold">Cinema OS</span>
                                 </Link>
