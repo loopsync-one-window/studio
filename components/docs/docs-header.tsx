@@ -386,7 +386,6 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-full text-[14px] font-medium transition-all duration-300 border backdrop-blur-md shadow-lg
                     ${isDarkMode ? "bg-white/10 border-white/10 hover:bg-white/20 hover:border-white/20 text-white" : "bg-white border-black/5 hover:bg-white/10 hover:border-black/10 text-black"}`}
                 >
-                    <Sparkles className="w-3.5 h-3.5 text-pink-500" />
                     <span className="font-semibold">Try WriteOS</span>
                 </button>
 

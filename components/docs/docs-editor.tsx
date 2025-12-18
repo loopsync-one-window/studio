@@ -16,6 +16,9 @@ import { useEffect, useState, useCallback } from 'react'
 import { Document } from './extensions/document'
 import { Page } from './extensions/page'
 import { BackspaceHandler } from './extensions/backspace-handler'
+import { FontSize } from './extensions/font-size'
+import { TextStyle } from '@tiptap/extension-text-style'
+import FontFamily from '@tiptap/extension-font-family'
 import { flushSync } from 'react-dom'
 
 export function DocsEditor() {
@@ -52,6 +55,9 @@ export function DocsEditor() {
             Document, // Custom Document
             Page,     // Custom Page
             BackspaceHandler, // Custom Backspace
+            TextStyle,
+            FontFamily,
+            FontSize,
             StarterKit.configure({
                 document: false, // Disable default Document
             }),
@@ -283,8 +289,24 @@ export function DocsEditor() {
             padding: ${pageSetup.margins.top}cm ${pageSetup.margins.right}cm ${pageSetup.margins.bottom}cm ${pageSetup.margins.left}cm;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            overflow: hidden; /* Hide overflow until moved */
+            overflow: hidden;
+            font-family: 'Inter', sans-serif; /* Default font */
+            font-size: 11pt; /* Default font size */
         }
+        
+        /* Typography overrides for Tailwind */
+        .page-node h1 { font-size: 2.5em; font-weight: bold; margin-bottom: 0.5em; line-height: 1.2; }
+        .page-node h2 { font-size: 2em; font-weight: bold; margin-bottom: 0.5em; line-height: 1.3; }
+        .page-node h3 { font-size: 1.75em; font-weight: bold; margin-bottom: 0.5em; line-height: 1.4; }
+        .page-node h4 { font-size: 1.5em; font-weight: bold; margin-bottom: 0.5em; }
+        .page-node h5 { font-size: 1.25em; font-weight: bold; margin-bottom: 0.5em; }
+        .page-node p { margin-bottom: 1em; line-height: 1.6; }
+        .page-node ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1em; }
+        .page-node ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1em; }
+        .page-node ul ul, .page-node ol ul, .page-node ul ol, .page-node ol ol { margin-bottom: 0; }
+        .page-node li { margin-bottom: 0.25em; }
+        .page-node blockquote { border-left: 4px solid #ccc; padding-left: 1em; margin-left: 0; margin-right: 0; font-style: italic; }
+        
         .ProseMirror {
             outline: none;
             display: flex;
