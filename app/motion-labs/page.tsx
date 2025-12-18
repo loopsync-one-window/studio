@@ -1,6 +1,6 @@
 "use client"
 
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -160,6 +160,9 @@ export default function Page() {
         if (!title.trim()) setTitle("Untitled Project")
         setIsEditing(false)
     }
+
+    // Access global sidebar state
+    const { state: sidebarState } = useSidebar()
 
     return (
         <div className="flex flex-col h-full w-full bg-[#000000] text-white overflow-hidden font-sans selection:bg-blue-500/30">
@@ -454,12 +457,30 @@ export default function Page() {
                                     thumb
                                 />
                                 <TrackClip
-                                    name="IMG_4825.MOV"
+                                    name="IMG_485.MOV"
                                     duration={180}
                                     start={310}
                                     color="bg-zinc-800/40 border-zinc-700/50 hover:bg-zinc-800/60"
                                     active={selectedClip === 2}
                                     onClick={() => setSelectedClip(2)}
+                                    thumb
+                                />
+                                <TrackClip
+                                    name="IMG_425.MOV"
+                                    duration={180}
+                                    start={500}
+                                    color="bg-zinc-800/40 border-zinc-700/50 hover:bg-zinc-800/60"
+                                    active={selectedClip === 3}
+                                    onClick={() => setSelectedClip(3)}
+                                    thumb
+                                />
+                                <TrackClip
+                                    name="IMG_48825.MOV"
+                                    duration={180}
+                                    start={690}
+                                    color="bg-zinc-800/40 border-zinc-700/50 hover:bg-zinc-800/60"
+                                    active={selectedClip === 4}
+                                    onClick={() => setSelectedClip(4)}
                                     thumb
                                 />
                             </TimelineTrack>
@@ -489,7 +510,12 @@ export default function Page() {
                 </div>
 
                 {/* 4. Properties Panel (Right Sidebar) */}
-                <div className="w-[320px] flex-none border-l border-white/[0.05] bg-[#09090b] flex flex-col z-10 hidden xl:flex">
+                <div
+                    className={cn(
+                        "flex-none bg-[#09090b] flex flex-col z-10 transition-all duration-300 ease-in-out overflow-hidden hidden xl:flex",
+                        sidebarState === "expanded" ? "w-0 border-none opacity-0" : "w-[320px] border-l border-white/[0.05] opacity-100"
+                    )}
+                >
                     {selectedClip ? (
                         <>
                             <div className="h-14 flex items-center px-4 border-b border-white/[0.05] gap-2">

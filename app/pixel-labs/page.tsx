@@ -354,6 +354,21 @@ export default function Page() {
                                 <h2 className="font-medium text-sm text-white">Auto Craft</h2>
                             </div>
                             <div className="p-4 space-y-6 overflow-y-auto flex-1 flex flex-col">
+                                {/* Face Swap UI */}
+                                <div className="p-4 bg-transparent rounded-3xl border border-white/10 space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-transparent flex items-center justify-center border border-white/20">
+                                            <ScanFace className="h-5 w-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-medium text-white">Face Swap</div>
+                                            <div className="text-xs text-zinc-500">Replace faces in photos</div>
+                                        </div>
+                                    </div>
+                                    <Button className="w-full rounded-full bg-white hover:bg-white/90 cursor-pointer text-black shadow-lg shadow-white/10 transition-all font-medium h-9">
+                                        Try Beta Version
+                                    </Button>
+                                </div>
                                 <AdjustmentSection title="Your Vision" icon={Type}>
                                     <textarea
                                         className="w-full h-32 bg-transparent mt-0 border border-white/5 rounded-xl p-3 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/10 resize-none"

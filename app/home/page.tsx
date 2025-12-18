@@ -1,12 +1,29 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus, Search, FileText, Layout, Instagram, Globe, MoreHorizontal, Play, Clock, Music } from "lucide-react"
+import { Dithering } from "@paper-design/shaders-react"
 
 export default function Page() {
     return (
         <>
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6 lg:p-10 pt-6">
+            <div className="flex-1 overflow-y-auto p-6 lg:p-10 pt-6 relative overflow-hidden">
+                {/* Background Dithering Effect */}
+                <div className="absolute right-0 top-0 w-1/1 h-[600px] z-0 pointer-events-none opacity-80 mix-blend-screen">
+                    <Dithering
+                        style={{ height: "100%", width: "100%" }}
+                        colorBack="hsl(0, 0%, 0%)"
+                        colorFront="hsla(0, 100%, 24%, 1.00)"
+                        shape={"cat" as any}
+                        type="4x4"
+                        pxSize={3}
+                        offsetX={0}
+                        offsetY={0}
+                        scale={0.8}
+                        rotation={0}
+                        speed={0.1}
+                    />
+                </div>
                 <div className="relative z-10 max-w-6xl w-full mx-auto space-y-12 pl-4">
 
                     {/* Hero Section (Canva-like) */}
@@ -14,20 +31,30 @@ export default function Page() {
                         <div className="space-y-2">
                             <div className="flex items-center justify-center gap-4 mb-4">
                                 <SidebarTrigger className="-ml-1 md:hidden" />
-                                <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">One Studio. Every Visual.</h1>
+
+                                {/* Studio 3.0 Logo Heading */}
+                                <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white relative">
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]">
+                                        Studio&nbsp;3.0
+                                    </span>
+                                </h1>
                             </div>
-                            <p className="text-zinc-400 text-lg">Create stunning visuals, videos, and more with Studio 3.0</p>
+
+                            <p className="text-white text-lg">
+                                Create stunning visuals, videos, and more with Studio 3.0
+                            </p>
                         </div>
+
 
                         {/* Search Bar */}
                         <div className="relative w-full max-w-2xl group">
                             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-zinc-500 group-focus-within:text-white transition-colors" />
+                                <Search className="h-5 w-5 text-white group-focus-within:text-white transition-colors z-10" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Search your content or try our templates"
-                                className="w-full h-14 pl-12 pr-4 bg-transparent border border-white/5 rounded-full text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all shadow-lg"
+                                className="w-full h-14 pl-12 pr-4 bg-transparent backdrop-blur-sm border border-white/5 rounded-full text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/5 transition-all shadow-lg"
                             />
                         </div>
 
@@ -43,7 +70,7 @@ export default function Page() {
                     </section>
 
                     {/* My Creations (History) */}
-                    <section className="space-y-4">
+                    <section className="space-y-4 mb-30">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-semibold text-white">My Creations</h2>
                             <Button variant="link" className="text-zinc-400 hover:text-white">See all</Button>
@@ -57,7 +84,7 @@ export default function Page() {
                     </section>
 
                     {/* Sponsors & Trending Music Split */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-30">
                         {/* Audio Library */}
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
@@ -91,51 +118,68 @@ export default function Page() {
                                 <AlbumCard title="30" artist="Adele" color="bg-emerald-500" />
                             </div>
                         </section>
+
                     </div>
 
-                    {/* Face Swap (Moved down) */}
-                    <section className="space-y-6 pt-8 border-t border-white/5">
-                        <div className="flex items-center gap-2 mb-2">
-                            <h2 className="text-2xl font-semibold text-white">Face Swap</h2>
-                            <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20">LS Vision-Pro Model</span>
+                    {/* My Uploads */}
+                    <section className="space-y-4 pt-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-white">My Uploads</h2>
+                            <Button variant="link" className="text-zinc-400 hover:text-white">Upload</Button>
                         </div>
-
-                        <div className="p-8 border border-white/5 mt-5 rounded-3xl bg-black/50 relative overflow-hidden group">
-                            <div className="relative z-10 flex flex-col items-center mt-6">
-                                <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl mx-auto">
-                                    {/* Source Image */}
-                                    <div className="flex-1 w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group/upload">
-                                        <div className="h-16 w-16 rounded-full bg-zinc-800 flex items-center justify-center group-hover/upload:bg-zinc-700 transition-colors">
-                                            <Upload className="h-6 w-6 text-zinc-400 group-hover/upload:text-zinc-200" />
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-zinc-300 font-medium">Upload Source</p>
-                                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Images Section */}
+                            <div className="bg-transparent rounded-3xl border border-white/5 p-6 space-y-4">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <ImagePlus className="h-5 w-5 text-white" />
+                                        <span className="font-medium text-zinc-200">Images</span>
                                     </div>
-
-                                    {/* Swap Indicator */}
-                                    <div className="flex flex-col items-center gap-2 shrink-0">
-                                        <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-lg shadow-red-900/20">
-                                            <ArrowRightLeft className="h-5 w-5 text-black" />
+                                    <span className="text-xs">12 files</span>
+                                </div>
+                                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                                    {["bg-purple-500", "bg-pink-500", "bg-rose-500", "bg-orange-500", "bg-indigo-500"].map((color, i) => (
+                                        <div key={i} className={`aspect-square rounded-lg ${color}/20 border border-white/5 hover:border-white/20 transition-all cursor-pointer overflow-hidden group/img relative`}>
+                                            <div className={`absolute inset-0 ${color}/20`} />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                                <div className="w-full h-full bg-black/20 backdrop-blur-[1px]" />
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    {/* Target Image */}
-                                    <div className="flex-1 w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group/upload">
-                                        <div className="h-16 w-16 rounded-full bg-zinc-800 flex items-center justify-center group-hover/upload:bg-zinc-700 transition-colors">
-                                            <ImagePlus className="h-6 w-6 text-zinc-400 group-hover/upload:text-zinc-200" />
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-zinc-300 font-medium">Upload Target</p>
-                                        </div>
+                                    ))}
+                                    <div className="aspect-square rounded-lg border border-dashed border-white/30 bg-white/5 hover:border-white/30 hover:bg-white/5 transition-all cursor-pointer flex items-center justify-center text-zinc-500 hover:text-white">
+                                        <Upload className="h-4 w-4" />
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="mt-8">
-                                    <Button size="lg" className="h-12 px-8 rounded-full bg-white text-black hover:bg-zinc-200 font-medium text-base shadow-xl shadow-white/5 transition-all hover:scale-105 active:scale-95">
-                                        <Sparkles className="mr-2 h-4 w-4 text-black" />
-                                        Swap Faces Now
-                                    </Button>
+                            {/* Videos Section */}
+                            <div className="bg-transparent rounded-xl border border-white/5 p-6 space-y-4">
+                                <div className="flex items-center justify-between text-zinc-400 mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <Video className="h-5 w-5 text-white" />
+                                        <span className="font-medium text-zinc-200">Videos</span>
+                                    </div>
+                                    <span className="text-xs">4 files</span>
+                                </div>
+                                <div className="space-y-3">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="flex items-center gap-4 p-3 rounded-3xl bg-white/5 border border-white/5 hover:bg-zinc-800 transition-colors cursor-pointer group/vid">
+                                            <div className="h-12 w-20 bg-white rounded-lg flex items-center justify-center shrink-0 relative overflow-hidden">
+                                                <div className="absolute inset-0" />
+                                                <Play className="h-4 w-4 text-black opacity-50 group-hover/vid:opacity-100 transition-opacity" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between mb-0.5">
+                                                    <p className="text-sm font-medium text-zinc-300 truncate group-hover/vid:text-white transition-colors">marketing_demo_v{i}.mp4</p>
+                                                    <span className="text-[10px] text-zinc-600 bg-zinc-900 border border-white/5 px-1.5 py-0.5 rounded">1080p</span>
+                                                </div>
+                                                <p className="text-xs text-zinc-500">24.5 MB • 10s • Edited 2h ago</p>
+                                            </div>
+                                            <Button size="icon" variant="ghost" className="h-8 w-8 text-zinc-500 hover:text-white opacity-0 group-hover/vid:opacity-100 transition-opacity">
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -199,7 +243,7 @@ export default function Page() {
 function QuickAction({ icon, label }: { icon: React.ReactNode, label: string }) {
     return (
         <div className="flex flex-col items-center gap-2 group cursor-pointer">
-            <div className="h-14 w-14 rounded-full bg-[#1e1e1e] border border-white/5 flex items-center justify-center group-hover:bg-white/10 group-hover:scale-110 transition-all shadow-md">
+            <div className="h-14 w-14 rounded-full bg-transparent backdrop-blur-sm border border-white/5 flex items-center justify-center group-hover:bg-transparent group-hover:scale-110 transition-all shadow-md">
                 {icon}
             </div>
             <span className="text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">{label}</span>
@@ -215,7 +259,7 @@ function CreationCard({ title, type, date, image }: { title: string, type: strin
                 <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60" />
                 <div className="absolute bottom-3 left-3 right-3">
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 text-[12px] font-medium text-zinc-300 mb-1">
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white backdrop-blur-sm border border-white/10 text-[12px] font-medium text-black mb-1">
                         {type}
                     </div>
                 </div>
