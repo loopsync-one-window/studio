@@ -5,7 +5,7 @@ import { Dithering } from "@paper-design/shaders-react"
 import {
     FileText, Star, MessageSquare, Lock, Moon, Sun, ChevronRight, FilePlus, FolderOpen, Copy, Share, Mail, Download, Edit, Trash2, History, Info, Globe, Smartphone, Printer, QrCode, X, Check,
     Eye, Layout, Ruler, Maximize, Image, Table, PenTool, Minus, Calendar, ChevronDown, Bold, Pilcrow, AlignLeft, List, RemoveFormatting, CheckCheck, BarChart, GitCompare, Quote, Puzzle, Code, Zap, FileJson, Layers, Book, GraduationCap, Bell, MessageSquareWarning, Italic,
-    Users, UserCheck, File as FileIcon, FileCode, Clock, Tag, Languages, Heading1, Heading2, Heading3, AlignCenter, AlignRight, AlignJustify, ListOrdered, PlusCircle, LayoutTemplate, Underline, Strikethrough, Superscript, Subscript, Sparkles, Upload, AlertTriangle, MoreHorizontal, Settings
+    Users, UserCheck, File as FileIcon, FileCode, Clock, Tag, Languages, Heading1, Heading2, Heading3, AlignCenter, AlignRight, AlignJustify, ListOrdered, PlusCircle, LayoutTemplate, Underline, Strikethrough, Superscript, Subscript, Sparkles, Upload, AlertTriangle, MoreHorizontal, Settings, Loader2
 } from "lucide-react"
 import { useDocs } from "./docs-context"
 import { useState, useRef, useEffect } from "react"
@@ -21,6 +21,7 @@ export function DocsHeader({ id }: DocsHeaderProps) {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
     const [isMobileViewOpen, setIsMobileViewOpen] = useState(false)
     const [isWriteOSOpen, setIsWriteOSOpen] = useState(false)
+    const [isQrLoaded, setIsQrLoaded] = useState(false)
 
     // Modal States
     const [isOpenModal, setIsOpenModal] = useState(false)
@@ -59,6 +60,10 @@ export function DocsHeader({ id }: DocsHeaderProps) {
             titleInputRef.current.select()
         }
     }, [isEditingTitle])
+
+    useEffect(() => {
+        setIsQrLoaded(false)
+    }, [id])
 
     const handleCopy = () => {
         const url = `https://studio.loopsync.cloud/doc/${id || "demo"}`
@@ -266,8 +271,8 @@ export function DocsHeader({ id }: DocsHeaderProps) {
     return (
         <header className="flex items-center px-4 py-2 gap-4 select-none relative z-50">
             {/* Logo */}
-            <div className="bg-blue-600 rounded-lg p-2 cursor-pointer hover:bg-blue-700 transition">
-                <FileText className="text-white h-6 w-6" />
+            <div className="bg-blue-600 rounded-full p-2 px-4 cursor-pointer hover:bg-blue-700 transition">
+                <h1 className="text-white font-semibold">Studio Docs · 3.0</h1>
             </div>
 
             {/* Title & Menu */}
@@ -408,7 +413,7 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     {isDarkMode ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5" />}
                 </div>
 
-                <div className="bg-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:ring-2 hover:ring-purple-400 transition-all">
+                <div className="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">
                     R
                 </div>
             </div>
@@ -436,11 +441,17 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                                     <p className="text-xs text-gray-500 mt-1">Scan to view this doc on your phone</p>
                                 </div>
 
-                                <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-inner">
+                                <div className="bg-white p-2 rounded-xl border border-gray-100 shadow-inner min-h-[148px] min-w-[148px] flex items-center justify-center relative">
+                                    {!isQrLoaded && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+                                        </div>
+                                    )}
                                     <img
                                         src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://studio.loopsync.cloud/doc/${id || "demo"}`}
                                         alt="QR Code"
-                                        className="w-32 h-32 rounded-lg"
+                                        className={`w-32 h-32 rounded-lg transition-opacity duration-300 ${isQrLoaded ? "opacity-100" : "opacity-0"}`}
+                                        onLoad={() => setIsQrLoaded(true)}
                                     />
                                 </div>
 
@@ -464,7 +475,7 @@ export function DocsHeader({ id }: DocsHeaderProps) {
             {/* WriteOS Modal */}
             {
                 isWriteOSOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent backdrop-blur-sm animate-in fade-in duration-300">
                         <div className="relative w-[600px] h-[400px] rounded-3xl overflow-hidden animate-in zoom-in-95 duration-300 ring-1 ring-white/10 group">
 
                             {/* Content */}
@@ -484,7 +495,7 @@ export function DocsHeader({ id }: DocsHeaderProps) {
 
                                     <div className="flex w-full gap-2 p-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 shadow-2xl">
                                         <Input
-                                            placeholder="Describe your idea..."
+                                            placeholder="Describe your goal..."
                                             className="bg-transparent border-transparent text-white placeholder:text-white/40 focus-visible:ring-0 h-10"
                                         />
                                         <Button className="bg-white text-black hover:bg-gray-200 font-semibold rounded-lg h-10 px-6 transition-all hover:scale-105 active:scale-95">

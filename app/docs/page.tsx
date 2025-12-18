@@ -6,6 +6,7 @@ import { DocsHeader } from "@/components/docs/docs-header"
 import { DocsToolbar } from "@/components/docs/docs-toolbar"
 import { DocsRightSidebar } from "@/components/docs/docs-right-sidebar"
 import { DocsEditor } from "@/components/docs/docs-editor"
+import { useEffect, useState } from "react"
 
 export default function DocsPage() {
     const searchParams = useSearchParams()
@@ -36,7 +37,44 @@ function DocsPageContent({ module, version, lang, type, id }: any) {
                     <DocsEditor />
                 </main>
                 <DocsRightSidebar />
+                <WordCount />
             </div>
+        </div>
+    )
+}
+
+function WordCount() {
+    const { editor, isDarkMode } = useDocs()
+    const [stats, setStats] = useState({ words: 0, characters: 0 })
+
+    useEffect(() => {
+        if (!editor) return
+
+        const updateStats = () => {
+            setStats({
+                words: editor.storage.characterCount.words(),
+                characters: editor.storage.characterCount.characters()
+            })
+        }
+
+        updateStats()
+        editor.on('update', updateStats)
+        editor.on('transaction', updateStats)
+
+        return () => {
+            editor.off('update', updateStats)
+            editor.off('transaction', updateStats)
+        }
+    }, [editor])
+
+    if (!editor) return null
+
+    return (
+        <div className={`absolute bottom-4 right-8 z-50 text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-md transition-colors ${isDarkMode
+            ? "bg-white/10 text-white/50 border border-white/5"
+            : "bg-black/5 text-black/50 border border-black/5"
+            }`}>
+            {stats.words} words
         </div>
     )
 }

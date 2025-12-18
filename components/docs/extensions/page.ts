@@ -3,7 +3,7 @@ import { Node, mergeAttributes } from '@tiptap/core'
 export const Page = Node.create({
     name: 'page',
 
-    group: 'block',
+    // group: 'block',
 
     content: 'block+',
 

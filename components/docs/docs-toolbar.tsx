@@ -217,12 +217,12 @@ export function DocsToolbar() {
                     isActive={editor.isActive('orderedList')}
                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
                 />
-                <ToolBtn
+                {/* <ToolBtn
                     icon={<CheckSquare className="w-4 h-4" />}
                     isActive={editor.isActive('taskList')}
                     onClick={() => editor.chain().focus().toggleTaskList?.().run()}
                     disabled={!editor.can().toggleTaskList}
-                />
+                /> */}
             </div>
 
             <style jsx global>{`

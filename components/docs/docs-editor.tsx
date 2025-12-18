@@ -2,6 +2,9 @@
 
 import { useEditor, EditorContent, ReactRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import CharacterCount from '@tiptap/extension-character-count'
+import TaskList from '@tiptap/extension-task-list'
+import TaskItem from '@tiptap/extension-task-item'
 import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
@@ -76,6 +79,11 @@ export function DocsEditor() {
             TableRow,
             TableHeader,
             TableCell,
+            CharacterCount,
+            TaskList,
+            TaskItem.configure({
+                nested: true,
+            }),
         ],
         content: `
         <div class="page-node">
