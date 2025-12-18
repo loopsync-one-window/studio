@@ -30,7 +30,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" className="border-r-0 bg-sidebar text-sidebar-foreground group/sidebar z-[9999]">
             <div className="flex flex-col h-full w-full overflow-hidden relative">
                 {/* Gradient Background Effect */}
-                <div className="absolute top-[-5%] left-[-10%] w-[150%] h-[50%] bg-[#416304] blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-[-5%] left-[-10%] w-[150%] h-[50%] bg-[#e60076] blur-[100px] rounded-full pointer-events-none" />
 
                 <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2 flex items-center gap-4 h-16 backdrop-blur-sm group-data-[collapsible=icon]:justify-center relative z-10">
                     {/*  Use group-data-[collapsible=icon] to switch between full/icon views if needed, or just let Sidebar handle it */}
@@ -52,10 +52,10 @@ export function AppSidebar() {
                 <SidebarContent className="py-4 relative z-10 overflow-hidden">
                     <SidebarMenu className="gap-2 px-3 group-data-[collapsible=icon]:px-0">
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/home"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Home">
+                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/home"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/30 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Home">
                                 <Link href="/home">
                                     <Home className="h-5 w-5 shrink-0" />
-                                    <span className="group-data-[collapsible=icon]:hidden">Home</span>
+                                    <span className="group-data-[collapsible=icon]:hidden font-semibold">Home</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -63,23 +63,7 @@ export function AppSidebar() {
                             <SidebarMenuButton asChild size="lg" isActive={pathname === "/search"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Search">
                                 <Link href="/search">
                                     <Search className="h-5 w-5 shrink-0" />
-                                    <span className="group-data-[collapsible=icon]:hidden">Search</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/pixel-labs"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Pixel Labs">
-                                <Link href="/pixel-labs">
-                                    <Aperture className="h-5 w-5 shrink-0" />
-                                    <span className="group-data-[collapsible=icon]:hidden">Pixel Labs</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/motion-labs"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Motion Labs">
-                                <Link href="/motion-labs">
-                                    <Clapperboard className="h-5 w-5 shrink-0" />
-                                    <span className="group-data-[collapsible=icon]:hidden">Motion Labs</span>
+                                    <span className="group-data-[collapsible=icon]:hidden font-semibold">Search</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -87,10 +71,27 @@ export function AppSidebar() {
                             <SidebarMenuButton asChild size="lg" isActive={pathname === "/images"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Images">
                                 <Link href="/images">
                                     <ImageIcon className="h-5 w-5 shrink-0" />
-                                    <span className="group-data-[collapsible=icon]:hidden">Images</span>
+                                    <span className="group-data-[collapsible=icon]:hidden font-semibold">Images</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/pixelOS"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Pixel OS">
+                                <Link href="/pixelOS">
+                                    <Aperture className="h-5 w-5 shrink-0" />
+                                    <span className="group-data-[collapsible=icon]:hidden font-semibold">Pixel OS</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild size="lg" isActive={pathname === "/motionOS"} className="rounded-full pl-6 pr-4 hover:bg-white/10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:mx-auto transition-all data-[active=true]:bg-white/5 data-[active=true]:ring-2 data-[active=true]:ring-white/5" tooltip="Motion OS">
+                                <Link href="/motionOS">
+                                    <Clapperboard className="h-5 w-5 shrink-0" />
+                                    <span className="group-data-[collapsible=icon]:hidden font-semibold">Cinema OS</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+
                     </SidebarMenu>
                 </SidebarContent>
 

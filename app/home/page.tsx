@@ -13,7 +13,7 @@ export default function Page() {
                     <Dithering
                         style={{ height: "100%", width: "100%" }}
                         colorBack="hsl(0, 0%, 0%)"
-                        colorFront="hsla(82, 100%, 24%, 1.00)"
+                        colorFront="#e60076"
                         shape={"cat" as any}
                         type="4x4"
                         pxSize={3}
@@ -33,7 +33,7 @@ export default function Page() {
                                 <SidebarTrigger className="-ml-1 md:hidden" />
 
                                 {/* Studio 3.0 Logo Heading */}
-                                <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white relative">
+                                <h1 className="text-4xl md:text-7xl font-bold tracking-tight text-white relative">
                                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]">
                                         Studio&nbsp;3.0
                                     </span>
