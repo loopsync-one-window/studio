@@ -30,7 +30,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" className="border-r-0 bg-sidebar text-sidebar-foreground group/sidebar z-[9999]">
             <div className="flex flex-col h-full w-full overflow-hidden relative">
                 {/* Gradient Background Effect */}
-                <div className="absolute top-[-5%] left-[-10%] w-[150%] h-[30%] bg-red-900/60 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-[-5%] left-[-10%] w-[150%] h-[50%] bg-[#416304] blur-[80px] rounded-full pointer-events-none" />
 
                 <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2 flex items-center gap-4 h-16 backdrop-blur-sm group-data-[collapsible=icon]:justify-center relative z-10">
                     {/*  Use group-data-[collapsible=icon] to switch between full/icon views if needed, or just let Sidebar handle it */}

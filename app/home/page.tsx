@@ -13,7 +13,7 @@ export default function Page() {
                     <Dithering
                         style={{ height: "100%", width: "100%" }}
                         colorBack="hsl(0, 0%, 0%)"
-                        colorFront="hsla(0, 100%, 24%, 1.00)"
+                        colorFront="hsla(82, 100%, 24%, 1.00)"
                         shape={"cat" as any}
                         type="4x4"
                         pxSize={3}
