@@ -479,7 +479,7 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                         <div className="relative w-[600px] h-[400px] rounded-3xl overflow-hidden animate-in zoom-in-95 duration-300 ring-1 ring-white/10 group">
 
                             {/* Content */}
-                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-8 bg-black/20">
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-8 bg-black/50">
                                 <button
                                     onClick={() => setIsWriteOSOpen(false)}
                                     className="absolute top-6 right-6 p-2 rounded-full bg-black text-white hover:text-white hover:bg-black/40 transition-colors backdrop-blur-sm border border-white/5"
@@ -490,13 +490,13 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                                 <div className="flex flex-col items-center gap-6 w-full max-w-sm">
                                     <div className="space-y-2 text-center">
                                         <h2 className="text-7xl font-bold text-white tracking-tighter drop-shadow-2xl">WriteOS</h2>
-                                        <p className="text-white text-sm font-medium tracking-wide uppercase opacity-100">Next Gen Writing Experience</p>
+                                        <p className="text-white text-sm font-medium tracking-wide uppercase opacity-100 mb-10">Next Gen Writing Experience</p>
                                     </div>
 
                                     <div className="flex w-full gap-2 p-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 shadow-2xl">
                                         <Input
                                             placeholder="Describe your goal..."
-                                            className="bg-transparent border-transparent text-white placeholder:text-white/40 focus-visible:ring-0 h-10"
+                                            className="bg-transparent border-transparent text-white placeholder:text-white/50 focus-visible:ring-0 h-10"
                                         />
                                         <Button className="bg-white text-black hover:bg-gray-200 font-semibold rounded-lg h-10 px-6 transition-all hover:scale-105 active:scale-95">
                                             Start
