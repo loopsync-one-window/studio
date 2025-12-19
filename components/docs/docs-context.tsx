@@ -32,6 +32,16 @@ interface DocsContextType {
     removePage: (id: string) => void
     editor: Editor | null
     setEditor: (editor: Editor | null) => void
+    viewOptions: {
+        printLayout: boolean
+        showRulers: boolean
+        showOutline: boolean
+    }
+    setViewOptions: React.Dispatch<React.SetStateAction<{
+        printLayout: boolean
+        showRulers: boolean
+        showOutline: boolean
+    }>>
 }
 
 const DocsContext = createContext<DocsContextType | undefined>(undefined)
@@ -48,6 +58,11 @@ export function DocsProvider({ children }: { children: ReactNode }) {
     const [pageSetup, setPageSetup] = useState<PageSetup>(DEFAULT_PAGE_SETUP)
     const [pages, setPages] = useState<{ id: string, content: string }[]>([{ id: "page-1", content: "" }])
     const [editor, setEditor] = useState<Editor | null>(null)
+    const [viewOptions, setViewOptions] = useState({
+        printLayout: true,
+        showRulers: true,
+        showOutline: false
+    })
 
     const toggleDarkMode = () => setIsDarkMode(prev => !prev)
 
@@ -73,7 +88,9 @@ export function DocsProvider({ children }: { children: ReactNode }) {
             addPage,
             removePage,
             editor,
-            setEditor
+            setEditor,
+            viewOptions,
+            setViewOptions
         }}>
             {children}
         </DocsContext.Provider>

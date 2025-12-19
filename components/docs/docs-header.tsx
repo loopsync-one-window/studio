@@ -17,7 +17,7 @@ interface DocsHeaderProps {
 }
 
 export function DocsHeader({ id }: DocsHeaderProps) {
-    const { isDarkMode, toggleDarkMode, pageSetup, setPageSetup, addPage } = useDocs()
+    const { isDarkMode, toggleDarkMode, pageSetup, setPageSetup, addPage, editor, viewOptions, setViewOptions } = useDocs()
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
     const [isMobileViewOpen, setIsMobileViewOpen] = useState(false)
     const [isWriteOSOpen, setIsWriteOSOpen] = useState(false)
@@ -31,6 +31,20 @@ export function DocsHeader({ id }: DocsHeaderProps) {
     const [isDetailsModal, setIsDetailsModal] = useState(false)
     const [isPageSetupOpen, setIsPageSetupOpen] = useState(false)
     const [isPrintModal, setIsPrintModal] = useState(false)
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+    const [isTablePickerOpen, setIsTablePickerOpen] = useState(false)
+    const [isDrawingModalOpen, setIsDrawingModalOpen] = useState(false)
+    const [isWordCountModalOpen, setIsWordCountModalOpen] = useState(false)
+    const [imageUrl, setImageUrl] = useState("")
+
+    // Canvas Refs
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const [isDrawing, setIsDrawing] = useState(false)
+    const [drawingColor, setDrawingColor] = useState("#000000")
+    const [drawingTool, setDrawingTool] = useState<"pen" | "eraser">("pen")
+    const [drawingLineWidth, setDrawingLineWidth] = useState(2)
+
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [isCopied, setIsCopied] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
@@ -93,7 +107,33 @@ export function DocsHeader({ id }: DocsHeaderProps) {
         {
             label: "File",
             children: [
-                { icon: <FilePlus className="w-4 h-4" />, label: "New", shortcut: "", action: () => addPage() },
+                {
+                    icon: <FilePlus className="w-4 h-4" />,
+                    label: "New",
+                    shortcut: "",
+                    action: () => {
+                        addPage() // Keep existing state logic
+                        if (editor) {
+                            const contentSize = editor.state.doc.content.size
+                            editor.chain()
+                                .insertContentAt(contentSize, {
+                                    type: 'page',
+                                    content: [
+                                        {
+                                            type: 'paragraph',
+                                            content: [] // Empty paragraph
+                                        }
+                                    ]
+                                })
+                                .run()
+
+                            // Workaround for auto-deletion of empty pages: 
+                            // The editor's paginate logic might remove it if empty.
+                            // If it does, we might need to add content.
+                            // But let's try clean first.
+                        }
+                    }
+                },
                 { icon: <FolderOpen className="w-4 h-4" />, label: "Open", shortcut: "Ctrl+O", action: () => setIsOpenModal(true) },
                 { icon: <Copy className="w-4 h-4" />, label: "Make a copy", shortcut: "", action: () => window.open(window.location.href, "_blank") },
                 { type: "separator" },
@@ -136,12 +176,47 @@ export function DocsHeader({ id }: DocsHeaderProps) {
         {
             label: "Edit",
             children: [
-                { label: "Undo", shortcut: "Ctrl+Z" },
-                { label: "Redo", shortcut: "Ctrl+Y" },
+                {
+                    label: "Undo", shortcut: "Ctrl+Z", action: () => {
+                        editor?.chain().focus().undo().run()
+                    }
+                },
+                {
+                    label: "Redo", shortcut: "Ctrl+Y", action: () => {
+                        editor?.chain().focus().redo().run()
+                    }
+                },
                 { type: "separator" },
-                { label: "Cut", shortcut: "Ctrl+X" },
-                { label: "Copy", shortcut: "Ctrl+C" },
-                { label: "Paste", shortcut: "Ctrl+V" },
+                {
+                    label: "Cut", shortcut: "Ctrl+X", action: () => {
+                        if (!editor) return
+                        const { from, to } = editor.state.selection
+                        const text = editor.state.doc.textBetween(from, to, ' ')
+                        navigator.clipboard.writeText(text)
+                        editor.chain().focus().deleteSelection().run()
+                    }
+                },
+                {
+                    label: "Copy", shortcut: "Ctrl+C", action: () => {
+                        if (!editor) return
+                        const { from, to } = editor.state.selection
+                        const text = editor.state.doc.textBetween(from, to, ' ')
+                        navigator.clipboard.writeText(text)
+                    }
+                },
+                {
+                    label: "Paste", shortcut: "Ctrl+V", action: async () => {
+                        if (!editor) return
+                        try {
+                            const text = await navigator.clipboard.readText()
+                            if (text) {
+                                editor.chain().focus().insertContent(text).run()
+                            }
+                        } catch (err) {
+                            console.error('Failed to read clipboard contents: ', err)
+                        }
+                    }
+                },
             ]
         },
         {
@@ -152,28 +227,65 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     label: "Mode",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <Edit className="w-4 h-4" />, label: "Editing" },
-                        { icon: <MessageSquare className="w-4 h-4" />, label: "Suggesting" },
-                        { icon: <Eye className="w-4 h-4" />, label: "Viewing" }
+                        { icon: <Edit className="w-4 h-4" />, label: "Editing", action: () => editor?.setEditable(true) },
+                        { icon: <Eye className="w-4 h-4" />, label: "Viewing", action: () => editor?.setEditable(false) }
                     ]
                 },
                 { type: "separator" },
-                { icon: <Layout className="w-4 h-4" />, label: "Print Layout", shortcut: "" },
-                { icon: <Ruler className="w-4 h-4" />, label: "Show Rulers", shortcut: "" },
-                { icon: <Layers className="w-4 h-4" />, label: "Show Outline", shortcut: "Ctrl+Alt+A" },
+                {
+                    icon: viewOptions.printLayout ? <Check className="w-4 h-4" /> : <div className="w-4 h-4" />,
+                    label: "Print Layout",
+                    shortcut: "",
+                    action: () => setViewOptions(prev => ({ ...prev, printLayout: !prev.printLayout }))
+                },
+                {
+                    icon: viewOptions.showRulers ? <Check className="w-4 h-4" /> : <div className="w-4 h-4" />,
+                    label: "Show Rulers",
+                    shortcut: "",
+                    action: () => setViewOptions(prev => ({ ...prev, showRulers: !prev.showRulers }))
+                },
+                {
+                    icon: viewOptions.showOutline ? <Check className="w-4 h-4" /> : <div className="w-4 h-4" />,
+                    label: "Show Outline",
+                    shortcut: "Ctrl+Alt+A",
+                    action: () => setViewOptions(prev => ({ ...prev, showOutline: !prev.showOutline }))
+                },
                 { type: "separator" },
-                { icon: <Maximize className="w-4 h-4" />, label: "Full Screen", shortcut: "" },
+                {
+                    icon: <Maximize className="w-4 h-4" />, label: "Full Screen", shortcut: "", action: () => {
+                        if (!document.fullscreenElement) {
+                            document.documentElement.requestFullscreen()
+                        } else {
+                            if (document.exitFullscreen) {
+                                document.exitFullscreen()
+                            }
+                        }
+                    }
+                },
             ]
         },
         {
             label: "Insert",
             children: [
-                { icon: <Image className="w-4 h-4" />, label: "Media Object", shortcut: "" },
-                { icon: <Table className="w-4 h-4" />, label: "Data Grid", shortcut: "" },
-                { icon: <PenTool className="w-4 h-4" />, label: "Canvas Drawing", shortcut: "" },
-                { icon: <Minus className="w-4 h-4" />, label: "Horizontal Rule", shortcut: "" },
-                { icon: <Calendar className="w-4 h-4" />, label: "Smart Date", shortcut: "@date" },
-                { icon: <ChevronDown className="w-4 h-4" />, label: "Dropdown Chip", shortcut: "@drop" },
+                { icon: <Image className="w-4 h-4" />, label: "Media Object", shortcut: "", action: () => setIsImageModalOpen(true) },
+                { icon: <Table className="w-4 h-4" />, label: "Data Grid", shortcut: "", action: () => setIsTablePickerOpen(true) },
+                { icon: <PenTool className="w-4 h-4" />, label: "Canvas Drawing", shortcut: "", action: () => setIsDrawingModalOpen(true) },
+                { icon: <Minus className="w-4 h-4" />, label: "Horizontal Rule", shortcut: "", action: () => editor?.chain().focus().setHorizontalRule().run() },
+                {
+                    icon: <Calendar className="w-4 h-4" />,
+                    label: "Smart Date",
+                    shortcut: "@date",
+                    action: () => {
+                        const date = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })
+                        // Insert text with marks instead of raw HTML span
+                        editor?.chain().focus()
+                            .setMark('highlight', { color: '#25bf20ff' }) // Tailwind blue-600
+                            .insertContent(` ${date} `)
+                            .unsetMark('highlight')
+                            .insertContent(' ')
+                            .run()
+                    }
+                },
             ]
         },
         {
@@ -184,12 +296,12 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     label: "Typography",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <Bold className="w-4 h-4" />, label: "Bold", shortcut: "Ctrl+B" },
-                        { icon: <Italic className="w-4 h-4" />, label: "Italic", shortcut: "Ctrl+I" },
-                        { icon: <Underline className="w-4 h-4" />, label: "Underline", shortcut: "Ctrl+U" },
-                        { icon: <Strikethrough className="w-4 h-4" />, label: "Strikethrough", shortcut: "Alt+Shift+5" },
-                        { icon: <Superscript className="w-4 h-4" />, label: "Superscript", shortcut: "Ctrl+." },
-                        { icon: <Subscript className="w-4 h-4" />, label: "Subscript", shortcut: "Ctrl+," }
+                        { icon: <Bold className="w-4 h-4" />, label: "Bold", shortcut: "Ctrl+B", action: () => editor?.chain().focus().toggleBold().run() },
+                        { icon: <Italic className="w-4 h-4" />, label: "Italic", shortcut: "Ctrl+I", action: () => editor?.chain().focus().toggleItalic().run() },
+                        { icon: <Underline className="w-4 h-4" />, label: "Underline", shortcut: "Ctrl+U", action: () => editor?.chain().focus().toggleUnderline().run() },
+                        { icon: <Strikethrough className="w-4 h-4" />, label: "Strikethrough", shortcut: "Alt+Shift+5", action: () => editor?.chain().focus().toggleStrike().run() },
+                        { icon: <Superscript className="w-4 h-4" />, label: "Superscript", shortcut: "Ctrl+.", action: () => editor?.chain().focus().toggleSuperscript().run() },
+                        { icon: <Subscript className="w-4 h-4" />, label: "Subscript", shortcut: "Ctrl+,", action: () => editor?.chain().focus().toggleSubscript().run() }
                     ]
                 },
                 {
@@ -197,12 +309,12 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     label: "Paragraph Styles",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <Pilcrow className="w-4 h-4" />, label: "Normal text" },
-                        { icon: <Heading1 className="w-4 h-4" />, label: "Title" },
-                        { icon: <Heading2 className="w-4 h-4" />, label: "Subtitle" },
-                        { icon: <Heading1 className="w-4 h-4" />, label: "Heading 1" },
-                        { icon: <Heading2 className="w-4 h-4" />, label: "Heading 2" },
-                        { icon: <Heading3 className="w-4 h-4" />, label: "Heading 3" }
+                        { icon: <Pilcrow className="w-4 h-4" />, label: "Normal text", action: () => editor?.chain().focus().setParagraph().run() },
+                        { icon: <Heading1 className="w-4 h-4" />, label: "Title", action: () => editor?.chain().focus().toggleHeading({ level: 1 }).run() },
+                        { icon: <Heading2 className="w-4 h-4" />, label: "Subtitle", action: () => editor?.chain().focus().toggleHeading({ level: 2 }).run() },
+                        { icon: <Heading1 className="w-4 h-4" />, label: "Heading 1", action: () => editor?.chain().focus().toggleHeading({ level: 1 }).run() },
+                        { icon: <Heading2 className="w-4 h-4" />, label: "Heading 2", action: () => editor?.chain().focus().toggleHeading({ level: 2 }).run() },
+                        { icon: <Heading3 className="w-4 h-4" />, label: "Heading 3", action: () => editor?.chain().focus().toggleHeading({ level: 3 }).run() }
                     ]
                 },
                 {
@@ -210,10 +322,10 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     label: "Alignment & Indent",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <AlignLeft className="w-4 h-4" />, label: "Left" },
-                        { icon: <AlignCenter className="w-4 h-4" />, label: "Center" },
-                        { icon: <AlignRight className="w-4 h-4" />, label: "Right" },
-                        { icon: <AlignJustify className="w-4 h-4" />, label: "Justified" }
+                        { icon: <AlignLeft className="w-4 h-4" />, label: "Left", action: () => editor?.chain().focus().setTextAlign('left').run() },
+                        { icon: <AlignCenter className="w-4 h-4" />, label: "Center", action: () => editor?.chain().focus().setTextAlign('center').run() },
+                        { icon: <AlignRight className="w-4 h-4" />, label: "Right", action: () => editor?.chain().focus().setTextAlign('right').run() },
+                        { icon: <AlignJustify className="w-4 h-4" />, label: "Justified", action: () => editor?.chain().focus().setTextAlign('justify').run() }
                     ]
                 },
                 {
@@ -221,37 +333,37 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                     label: "Bullets & Numbering",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <ListOrdered className="w-4 h-4" />, label: "Numbered list" },
-                        { icon: <List className="w-4 h-4" />, label: "Bulleted list" }
+                        { icon: <ListOrdered className="w-4 h-4" />, label: "Numbered list", action: () => editor?.chain().focus().toggleOrderedList().run() },
+                        { icon: <List className="w-4 h-4" />, label: "Bulleted list", action: () => editor?.chain().focus().toggleBulletList().run() }
                     ]
                 },
                 { type: "separator" },
-                { icon: <RemoveFormatting className="w-4 h-4" />, label: "Clear Styles", shortcut: "Ctrl+\\" },
+                { icon: <RemoveFormatting className="w-4 h-4" />, label: "Clear Styles", shortcut: "Ctrl+\\", action: () => editor?.chain().focus().unsetAllMarks().clearNodes().run() },
             ]
         },
         {
             label: "Tools",
             children: [
-                { icon: <CheckCheck className="w-4 h-4" />, label: "Spell Check", shortcut: "Ctrl+Alt+X" },
-                { icon: <BarChart className="w-4 h-4" />, label: "Word Count", shortcut: "Ctrl+Shift+C" },
-                { icon: <GitCompare className="w-4 h-4" />, label: "Compare Documents", shortcut: "" },
-                { icon: <Quote className="w-4 h-4" />, label: "Citations", shortcut: "" },
-                { type: "separator" },
-                { icon: <FileJson className="w-4 h-4" />, label: "Linked Objects", shortcut: "" },
+                { icon: <CheckCheck className="w-4 h-4" />, label: "Spell Check", shortcut: "Ctrl+Alt+X", action: () => alert("Spell Check enabled via browser settings.") },
+                { icon: <BarChart className="w-4 h-4" />, label: "Word Count", shortcut: "Ctrl+Shift+C", action: () => setIsWordCountModalOpen(true) },
+                // { icon: <GitCompare className="w-4 h-4" />, label: "Compare Documents", shortcut: "" },
+                // { icon: <Quote className="w-4 h-4" />, label: "Citations", shortcut: "" },
+                // { type: "separator" },
+                // { icon: <FileJson className="w-4 h-4" />, label: "Linked Objects", shortcut: "" },
             ]
         },
         {
-            label: "Extensions",
+            label: "WriteOS",
             children: [
-                { icon: <Puzzle className="w-4 h-4" />, label: "Manage Add-ons", shortcut: "" },
-                { icon: <Code className="w-4 h-4" />, label: "Apps Script", shortcut: "" },
+                { icon: <Puzzle className="w-4 h-4" />, label: "Manage WriteOS", shortcut: "" },
+                { icon: <Code className="w-4 h-4" />, label: "Tune Goal Theme", shortcut: "" },
                 {
                     icon: <Zap className="w-4 h-4" />,
-                    label: "AppSheet",
+                    label: "Help Center",
                     hasSubmenu: true,
                     submenu: [
-                        { icon: <PlusCircle className="w-4 h-4" />, label: "Create an app" },
-                        { icon: <LayoutTemplate className="w-4 h-4" />, label: "View sample apps" }
+                        { icon: <PlusCircle className="w-4 h-4" />, label: "WriteOS Support" },
+                        { icon: <LayoutTemplate className="w-4 h-4" />, label: "View sample goals" }
                     ]
                 },
             ]
@@ -674,6 +786,45 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                 )
             }
 
+            {/* Word Count Modal */}
+            {
+                isWordCountModalOpen && editor && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white rounded-xl shadow-2xl w-[350px] p-6 animate-in zoom-in-95 duration-200">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-semibold text-lg text-gray-900">Word Count</h3>
+                                <button onClick={() => setIsWordCountModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="flex justify-between py-2 border-b border-gray-50">
+                                    <span className="text-sm text-gray-500">Words</span>
+                                    <span className="text-sm font-medium text-gray-900">{editor.storage.characterCount.words()}</span>
+                                </div>
+                                <div className="flex justify-between py-2 border-b border-gray-50">
+                                    <span className="text-sm text-gray-500">Characters</span>
+                                    <span className="text-sm font-medium text-gray-900">{editor.storage.characterCount.characters()}</span>
+                                </div>
+                                <div className="flex justify-between py-2">
+                                    <span className="text-sm text-gray-500">Characters (excluding spaces)</span>
+                                    <span className="text-sm font-medium text-gray-900">
+                                        {editor.state.doc.textContent.replace(/\s/g, '').length}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2 pt-2">
+                                    <input type="checkbox" id="display-while-typing" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                    <label htmlFor="display-while-typing" className="text-sm text-gray-600">Display word count while typing</label>
+                                </div>
+                                <div className="pt-2 flex justify-end">
+                                    <Button onClick={() => setIsWordCountModalOpen(false)} className="bg-blue-600 text-white rounded-full hover:bg-blue-700">Done</Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
             {/* Page Setup Drawer */}
             {/* Page Setup Drawer */}
             {isPageSetupOpen && (
@@ -798,54 +949,236 @@ export function DocsHeader({ id }: DocsHeaderProps) {
                             <div className="w-80 bg-gray-50 border-r border-gray-200 p-6 flex flex-col">
                                 <h3 className="font-semibold text-lg text-gray-900 mb-6">Print</h3>
                                 <div className="space-y-6 flex-1">
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-700 block mb-2">Destination</label>
-                                        <select className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm bg-white">
-                                            <option>Save as PDF</option>
-                                            <option>Canon G3010 Series</option>
-                                            <option>Microsoft Print to PDF</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-700 block mb-2">Pages</label>
-                                        <select className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm bg-white">
-                                            <option>All</option>
-                                            <option>Custom</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-700 block mb-2">Color</label>
-                                        <select className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm bg-white">
-                                            <option>Black & White</option>
-                                            <option>Color</option>
-                                        </select>
+                                    {/* Print options would go here */}
+                                    <div className="flex items-center justify-center h-full text-gray-400">
+                                        Print Preview Logic
                                     </div>
                                 </div>
-                                <div className="flex gap-3 pt-6 border-t border-gray-200">
-                                    <Button variant="outline" className="flex-1" onClick={() => setIsPrintModal(false)}>Cancel</Button>
-                                    <Button className="flex-1">Print</Button>
+                                <div className="pt-6 border-t border-gray-200 flex gap-3">
+                                    <Button onClick={() => setIsPrintModal(false)} variant="outline" className="flex-1">Cancel</Button>
+                                    <Button onClick={() => window.print()} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">Print</Button>
                                 </div>
                             </div>
                             {/* Preview */}
-                            <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center overflow-auto">
-                                <div className="bg-white w-[400px] h-[560px] shadow-sm flex flex-col p-8 mb-4">
-                                    <div className="space-y-4">
-                                        <div className="h-4 bg-gray-100 w-3/4 rounded" />
-                                        <div className="h-3 bg-gray-100 w-full rounded" />
-                                        <div className="h-3 bg-gray-100 w-full rounded" />
-                                        <div className="h-3 bg-gray-100 w-5/6 rounded" />
-                                        <div className="space-y-2 mt-8">
-                                            <div className="h-3 bg-gray-100 w-full rounded" />
-                                            <div className="h-3 bg-gray-100 w-full rounded" />
-                                            <div className="h-3 bg-gray-100 w-4/5 rounded" />
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="flex-1 bg-gray-100 flex items-center justify-center p-8">
+                                <div className="bg-white shadow-xl w-[21cm] h-[29.7cm] transform scale-75 origin-center" />
                             </div>
                         </div>
                     </div>
                 )
             }
+
+            {/* Image Insertion Modal */}
+            {isImageModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className={`rounded-xl shadow-2xl w-[500px] p-6 animate-in zoom-in-95 duration-200 ${isDarkMode ? "bg-[#1e1e1e] border border-white/10" : "bg-white"}`}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className={`font-semibold text-lg ${isDarkMode ? "text-white" : "text-gray-900"}`}>Insert Media Object</h3>
+                            <button onClick={() => setIsImageModalOpen(false)} className={`${isDarkMode ? "text-gray-400 hover:text-white" : "text-gray-400 hover:text-gray-600"}`}>
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-6">
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${isDarkMode ? "border-white/10 hover:border-white/20 hover:bg-white/5" : "border-gray-200 hover:border-blue-500 hover:bg-blue-50"}`}
+                            >
+                                <Upload className={`w-10 h-10 mb-2 ${isDarkMode ? "text-gray-400" : "text-blue-500"}`} />
+                                <p className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Click to upload image</p>
+                                <p className="text-xs text-gray-500 mt-1">SVG, PNG, JPG or GIF (max. 10MB)</p>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                            const url = URL.createObjectURL(file)
+                                            editor?.chain().focus().setImage({ src: url }).run()
+                                            setIsImageModalOpen(false)
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <span className="w-full border-t border-gray-200" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className={`px-2 ${isDarkMode ? "bg-[#1e1e1e] text-gray-500" : "bg-white text-gray-500"}`}>Or via URL</span>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <Input
+                                    placeholder="Paste image URL here..."
+                                    value={imageUrl}
+                                    onChange={(e) => setImageUrl(e.target.value)}
+                                    className={`${isDarkMode ? "bg-white/5 border-white/10 text-white" : ""}`}
+                                />
+                                <Button
+                                    onClick={() => {
+                                        if (imageUrl) {
+                                            editor?.chain().focus().setImage({ src: imageUrl }).run()
+                                            setIsImageModalOpen(false)
+                                            setImageUrl("")
+                                        }
+                                    }}
+                                >Insert</Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Table Picker Modal (Data Grid) */}
+            {isTablePickerOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className={`rounded-xl shadow-2xl w-auto p-6 animate-in zoom-in-95 duration-200 ${isDarkMode ? "bg-[#1e1e1e] border border-white/10" : "bg-white"}`}>
+                        <div className="flex justify-between items-center mb-4 gap-8">
+                            <h3 className={`font-semibold text-lg ${isDarkMode ? "text-white" : "text-gray-900"}`}>Insert Data Grid</h3>
+                            <button onClick={() => setIsTablePickerOpen(false)} className={`${isDarkMode ? "text-gray-400 hover:text-white" : "text-gray-400 hover:text-gray-600"}`}>
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <TableGridPicker
+                                isDarkMode={isDarkMode}
+                                onSelect={(rows, cols) => {
+                                    editor?.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run()
+                                    setIsTablePickerOpen(false)
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Canvas Drawing Modal */}
+            {isDrawingModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl w-[90%] h-[90%] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                            <div className="flex items-center gap-4">
+                                <h3 className="font-semibold text-lg text-gray-900">Canvas Drawing</h3>
+                                <div className="h-6 w-[1px] bg-gray-300" />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setDrawingTool("pen")}
+                                        className={`p-2 rounded ${drawingTool === "pen" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-200"}`}
+                                        title="Pen"
+                                    >
+                                        <PenTool className="w-4 h-4" />
+                                    </button>
+                                    <input
+                                        type="color"
+                                        value={drawingColor}
+                                        onChange={(e) => setDrawingColor(e.target.value)}
+                                        className="w-8 h-8 rounded cursor-pointer border-none"
+                                        title="Color"
+                                    />
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="20"
+                                        value={drawingLineWidth}
+                                        onChange={(e) => setDrawingLineWidth(parseInt(e.target.value))}
+                                        className="w-24 cursor-pointer"
+                                        title="Line Width"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <Button onClick={() => setIsDrawingModalOpen(false)} variant="outline">Cancel</Button>
+                                <Button
+                                    onClick={() => {
+                                        if (canvasRef.current) {
+                                            const dataUrl = canvasRef.current.toDataURL("image/png")
+                                            editor?.chain().focus().setImage({ src: dataUrl }).run()
+                                            setIsDrawingModalOpen(false)
+                                        }
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    Insert Drawing
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="flex-1 bg-white relative cursor-crosshair overflow-hidden touch-none"
+                            onMouseDown={(e) => {
+                                const canvas = canvasRef.current
+                                const ctx = canvas?.getContext('2d')
+                                if (canvas && ctx) {
+                                    setIsDrawing(true)
+                                    const rect = canvas.getBoundingClientRect()
+                                    ctx.beginPath()
+                                    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
+                                    ctx.strokeStyle = drawingColor
+                                    ctx.lineWidth = drawingLineWidth
+                                    ctx.lineCap = 'round'
+                                }
+                            }}
+                            onMouseMove={(e) => {
+                                if (!isDrawing) return
+                                const canvas = canvasRef.current
+                                const ctx = canvas?.getContext('2d')
+                                if (canvas && ctx) {
+                                    const rect = canvas.getBoundingClientRect()
+                                    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top)
+                                    ctx.stroke()
+                                }
+                            }}
+                            onMouseUp={() => setIsDrawing(false)}
+                            onMouseLeave={() => setIsDrawing(false)}
+                        >
+                            <canvas
+                                ref={canvasRef}
+                                width={1200}
+                                height={800}
+                                className="w-full h-full block"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </header >
+    )
+}
+
+function TableGridPicker({ isDarkMode, onSelect }: { isDarkMode: boolean, onSelect: (rows: number, cols: number) => void }) {
+    const [hoveredCell, setHoveredCell] = useState<{ r: number, c: number } | null>(null)
+
+    return (
+        <div className="flex flex-col gap-2">
+            <div
+                className="grid grid-cols-10 gap-1"
+                onMouseLeave={() => setHoveredCell(null)}
+            >
+                {[...Array(10)].map((_, rowIdx) => (
+                    [...Array(10)].map((_, colIdx) => {
+                        const r = rowIdx + 1
+                        const c = colIdx + 1
+                        const isActive = hoveredCell && r <= hoveredCell.r && c <= hoveredCell.c
+
+                        return (
+                            <div
+                                key={`${r}-${c}`}
+                                className={`w-6 h-6 border rounded-sm cursor-pointer transition-colors
+                                    ${isActive
+                                        ? "bg-blue-500 border-blue-600"
+                                        : (isDarkMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200")
+                                    }`}
+                                onMouseEnter={() => setHoveredCell({ r, c })}
+                                onClick={() => onSelect(r, c)}
+                            />
+                        )
+                    })
+                ))}
+            </div>
+            <div className={`text-center text-sm font-medium h-5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                {hoveredCell ? `${hoveredCell.r} x ${hoveredCell.c}` : "Select size"}
+            </div>
+        </div>
     )
 }

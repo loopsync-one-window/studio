@@ -8,12 +8,12 @@ import TaskItem from '@tiptap/extension-task-item'
 import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
-import Image from '@tiptap/extension-image'
+import { ResizableImage } from './extensions/resizable-image'
 import Link from '@tiptap/extension-link'
-import { Table } from '@tiptap/extension-table'
-import { TableRow } from '@tiptap/extension-table-row'
-import { TableCell } from '@tiptap/extension-table-cell'
-import { TableHeader } from '@tiptap/extension-table-header'
+import Highlight from '@tiptap/extension-highlight'
+import Superscript from '@tiptap/extension-superscript'
+import Subscript from '@tiptap/extension-subscript'
+import { EnhancedTable, EnhancedTableRow, EnhancedTableCell, EnhancedTableHeader } from './extensions/enhanced-table'
 import { useDocs } from './docs-context'
 import { useEffect, useState, useCallback } from 'react'
 import { Document } from './extensions/document'
@@ -25,7 +25,7 @@ import FontFamily from '@tiptap/extension-font-family'
 import { flushSync } from 'react-dom'
 
 export function DocsEditor() {
-    const { setEditor, pageSetup, isDarkMode } = useDocs()
+    const { setEditor, pageSetup, isDarkMode, viewOptions } = useDocs()
     const [isPaginating, setIsPaginating] = useState(false)
 
     // Helper to get raw dimensions in pixels
@@ -71,14 +71,20 @@ export function DocsEditor() {
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
-            Image,
-            Link,
-            Table.configure({
-                resizable: true,
+            ResizableImage.configure({
+                inline: false,
+                allowBase64: true,
             }),
-            TableRow,
-            TableHeader,
-            TableCell,
+            Link,
+            Highlight.configure({
+                multicolor: true,
+            }),
+            Superscript,
+            Subscript,
+            EnhancedTable,
+            EnhancedTableRow,
+            EnhancedTableHeader,
+            EnhancedTableCell,
             CharacterCount,
             TaskList,
             TaskItem.configure({
@@ -295,8 +301,9 @@ export function DocsEditor() {
             min-height: ${height}px;
             width: ${width}px;
             padding: ${pageSetup.margins.top}cm ${pageSetup.margins.right}cm ${pageSetup.margins.bottom}cm ${pageSetup.margins.left}cm;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin-bottom: ${viewOptions.printLayout ? '2rem' : '0'};
+            box-shadow: ${viewOptions.printLayout ? '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' : 'none'};
+            border-bottom: ${viewOptions.printLayout ? 'none' : '1px dashed #ccc'};
             overflow: hidden;
             font-family: 'Inter', sans-serif; /* Default font */
             font-size: 11pt; /* Default font size */
@@ -322,6 +329,62 @@ export function DocsEditor() {
             align-items: center;
             padding: 2rem;
             background: transparent;
+        }
+
+        .page-node table {
+            border-collapse: collapse;
+            margin-bottom: 1em;
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        .page-node td, .page-node th {
+            border: 1px solid ${isDarkMode ? '#555' : '#ccc'};
+            position: relative;
+            vertical-align: top;
+        }
+
+        .page-node th {
+            font-weight: bold;
+            text-align: left;
+            background-color: ${isDarkMode ? '#333' : '#f8f9fa'};
+        }
+
+        .page-node .selectedCell:after {
+            z-index: 2;
+            position: absolute;
+            content: "";
+            left: 0; right: 0; top: 0; bottom: 0;
+            background: rgba(200, 200, 255, 0.4);
+            pointer-events: none;
+        }
+
+        .page-node hr {
+            border: none;
+            border-top: 1px solid ${isDarkMode ? '#444' : '#ccc'};
+            margin: 1.5em 0;
+            width: 100%;
+        }
+
+        /* Column Resize Handle - Invisible but interactable */
+        .page-node .column-resize-handle {
+            background-color: transparent;
+            bottom: 0;
+            position: absolute;
+            right: -4px; /* Center over border */
+            width: 8px; /* Larger hit area */
+            top: 0;
+            cursor: col-resize;
+            pointer-events: auto; /* Ensure it captures clicks */
+        }
+        
+        /* Show guide on hover/active if desired, or keep invisible like Docs until drag */
+        .page-node .column-resize-handle:hover,
+        .page-node .resize-cursor {
+            background-color: #4285f4; /* Google Blue */
+            opacity: 0.5;
+            width: 2px; /* Visual width */
+            right: -1px; /* Center visual */
         }
     `
 

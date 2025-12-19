@@ -6,6 +6,8 @@ import { DocsHeader } from "@/components/docs/docs-header"
 import { DocsToolbar } from "@/components/docs/docs-toolbar"
 import { DocsRightSidebar } from "@/components/docs/docs-right-sidebar"
 import { DocsEditor } from "@/components/docs/docs-editor"
+import { DocsOutline } from "@/components/docs/docs-outline"
+import { DocsRuler } from "@/components/docs/docs-ruler"
 import { useEffect, useState, Suspense } from "react"
 
 export default function DocsPage() {
@@ -40,7 +42,9 @@ function DocsPageContent({ module, version, lang, type, id }: any) {
         <div className={`flex flex-col h-full font-sans relative z-10 transition-colors duration-300 ${isDarkMode ? "bg-[#191919] text-[#E2E2E2]" : "bg-[#F9FBFD] text-black"}`}>
             <DocsHeader id={id} />
             <DocsToolbar />
+            <DocsRuler />
             <div className="flex-1 flex overflow-hidden relative">
+                <DocsOutline />
                 <main className="flex-1 overflow-hidden relative flex flex-col">
                     <DocsEditor />
                 </main>
