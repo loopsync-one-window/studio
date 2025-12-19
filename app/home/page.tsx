@@ -62,7 +62,7 @@ export default function Page() {
                         {/* Quick Actions */}
                         <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-4">
                             <QuickAction icon={<FileText className="h-6 w-6 text-white" />} label="Docs" href="/docs?module=studio-3.0&version=2.1&lang=en&type=edit&id=STUDIO-3.0-DOCS-uhb776874637345435" />
-                            <QuickAction icon={<Layout className="h-6 w-6 text-white" />} label="Whiteboard" />
+                            <QuickAction icon={<Layout className="h-6 w-6 text-white" />} label="Whiteboard" href="/whiteboard" />
                             <QuickAction icon={<Video className="h-6 w-6 text-white" />} label="Video" />
                             <QuickAction icon={<Instagram className="h-6 w-6 text-white" />} label="Social Info" />
                             <QuickAction icon={<Globe className="h-6 w-6 text-white" />} label="Website" />
