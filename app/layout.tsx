@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Roboto, Merriweather, Courier_Prime } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { DynamicSidebar } from "@/components/dynamic-sidebar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -50,7 +50,7 @@ export default function RootLayout({
     return (
         <html lang="en" className="dark">
             <body className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${merriweather.variable} ${courierPrime.variable} antialiased`}>
-                <SidebarProvider>
+                <DynamicSidebar>
                     <div className="flex h-screen w-full bg-[#0a0a0a] text-white font-sans selection:bg-red-900/60 overflow-hidden">
                         <AppSidebar />
                         <main className="flex-1 flex flex-col relative overflow-hidden">
@@ -60,7 +60,7 @@ export default function RootLayout({
                             {children}
                         </main>
                     </div>
-                </SidebarProvider>
+                </DynamicSidebar>
             </body>
         </html>
     );

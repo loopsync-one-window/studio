@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus, Search, FileText, Layout, Instagram, Globe, MoreHorizontal, Play, Clock, Music } from "lucide-react"
+import { Upload, ArrowRightLeft, Sparkles, Video, Eraser, ScanFace, Wand2, ImagePlus, Search, FileText, Layout, Instagram, Globe, MoreHorizontal, Play, Clock, Music, RotateCcwKey, Popcorn, Camera, DecimalsArrowRightIcon, SplinePointer, CommandIcon, Drama, FlipHorizontal2, Rabbit, Pointer, LockOpenIcon, Split } from "lucide-react"
 import { Dithering } from "@paper-design/shaders-react"
 
 export default function Page() {
@@ -63,10 +63,10 @@ export default function Page() {
                         <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-4">
                             <QuickAction icon={<FileText className="h-6 w-6 text-white" />} label="Docs" href="/docs?module=studio-3.0&version=2.1&lang=en&type=edit&id=STUDIO-3.0-DOCS-uhb776874637345435" />
                             <QuickAction icon={<Layout className="h-6 w-6 text-white" />} label="Whiteboard" href="/whiteboard" />
-                            <QuickAction icon={<Video className="h-6 w-6 text-white" />} label="Video" />
-                            <QuickAction icon={<Instagram className="h-6 w-6 text-white" />} label="Social Info" />
-                            <QuickAction icon={<Globe className="h-6 w-6 text-white" />} label="Website" />
-                            <QuickAction icon={<MoreHorizontal className="h-6 w-6 text-white" />} label="More" />
+                            <QuickAction icon={<Popcorn className="h-6 w-6 text-white" />} label="CinemaOS" href="/cinemaOS" />
+                            <QuickAction icon={<Camera className="h-6 w-6 text-white" />} label="PixelOS" href="/pixelOS" />
+                            <QuickAction icon={<Rabbit className="h-6 w-6 text-white" />} label="Scene Craft" href="/sceneCraft" />
+                            <QuickAction icon={<Split className="h-6 w-6 text-white" />} label="Manage" href="https://loopsync.cloud/home" />
                         </div>
                     </section>
 
@@ -252,7 +252,16 @@ function QuickAction({ icon, label, href }: { icon: React.ReactNode, label: stri
     )
 
     if (href) {
-        return <Link href={href}>{Content}</Link>
+        const isExternal = href.startsWith('http');
+        return (
+            <Link
+                href={href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+            >
+                {Content}
+            </Link>
+        )
     }
 
     return Content
